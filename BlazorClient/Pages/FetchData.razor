@@ -4,6 +4,8 @@
 
 @using BlazorClient.Data
 @inject WeatherForecastService ForecastService
+@using Microsoft.Identity.Web
+@inject MicrosoftIdentityConsentAndConditionalAccessHandler ConsentHandler
 
 <h1>Weather forecast</h1>
 
@@ -43,6 +45,15 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        forecasts = await ForecastService.GetForecastAsync(DateTime.Now);
+        try
+        {
+            // downstreamAPI.CallWebApiAsync calls ITokenAcquisition.GetAccessTokenForUserAsync
+            forecasts = await ForecastService.GetForecastAsync(DateTime.Now);
+        }
+        catch (Exception ex)
+        {
+            ConsentHandler.HandleException(ex);
+        }
+        
     }
 }
